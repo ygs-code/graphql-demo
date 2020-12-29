@@ -1,21 +1,24 @@
 type Query {
-  dummy: String
+    dummy: String
 }
 type Mutation {
-  dummy: String
+    dummy: String
 }
 type Subscription {
-  dummy: String
+    dummy: String
 }
 schema {
-  query: Query
-  mutation: Mutation
-  subscription: Subscription
+    query: Query
+    mutation: Mutation
+    subscription: Subscription
 }
 type User {
-  name: String!
-  id: ID!
+    #名称
+    name: String!
+    #返回id
+    id: ID!
 }
 extend type Mutation {
-  updateUser(userId: ID!, name: String!): User
+    # 更新用户函数
+    updateUser(userId: ID!, name: String!): User
 }

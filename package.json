@@ -54,6 +54,7 @@
     "friendly-errors-webpack-plugin": "^1.7.0",
     "glob": "^7.1.6",
     "graphql": "^15.4.0",
+    "graphql-docs": "^0.2.0",
     "graphql-tools": "^7.0.2",
     "happypack": "^5.0.1",
     "hard-source-webpack-plugin": "^0.13.1",
@@ -94,7 +95,9 @@
     "utf-8-validate": "^5.0.3",
     "util": "^0.12.3"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "graphql-markdown": "^5.2.0"
+  },
   "scripts": {
     "start": "nodemon  --exec cross-env  NODE_ENV=development  babel-node ./src/index.js"
   },
