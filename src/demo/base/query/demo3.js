@@ -7,6 +7,13 @@ const parameter = {
 };
 //查询传参
 new CheckGraphql({
+  context:{
+    ctx: {
+      request: {},
+      respons: {},
+    },
+    next: () => {},
+  },
   serverSchema: {
     schema: `
      type User {

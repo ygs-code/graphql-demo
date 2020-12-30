@@ -7,6 +7,13 @@ const parameter = {
   name: "hi hello",
 };
 new CheckGraphql({
+  context:{
+    ctx: {
+      request: {},
+      respons: {},
+    },
+    next: () => {},
+  },
   serverSchema: {
     schema: `
 

@@ -1,37 +1,41 @@
 import CheckGraphql from "../CheckGraphql";
 // chalk插件，用来在命令行中输入不同颜色的文字
 import chalk from "chalk";
-const parameter = {
-  id: "123",
-  name: "hi hello",
-};
-//查询传参
+// 别名
 new CheckGraphql({
+  context: {
+    ctx: {
+      request: {},
+      respons: {},
+    },
+    next: () => {},
+  },
   serverSchema: {
     schema: `
-     type User {
-       id: ID!
-       name: String!
-     }
-
-     extend type Query {
-      getUser(userId:ID!,name:String!): User
+    type User {
+      msg: String  
     }
 
-   
+    extend type Query {
+      getUser(id:ID): User
+    }
     `,
     resolvers: {
       Mutation: {},
       Subscription: {},
       Query: {
         getUser: (root, parameter, source, fieldASTs) => {
-          console.log("root==", root);
-          console.log("parameter==", parameter);
+          const { id } = parameter;
+          // console.log("root==", root);
+          // console.log("parameter==", parameter);
+          const mapData = {
+            1: "返回第一个别名参数",
+            2: "返回第二个别名参数",
+          };
           // console.log('source==',source)
           // console.log('fieldASTs==',fieldASTs)
           return {
-            id: 123,
-            ...parameter,
+            msg: mapData[id],
           };
         },
       },
@@ -39,18 +43,16 @@ new CheckGraphql({
   },
   clientSchema: {
     schema: `
-    query($userId: ID! $name: String!) {
-      getUser(userId: $userId name: $name) {
-        name
-        id
+    query {
+      xiaomingUser: getUser(id: 1) {
+        msg
+      }
+      zhansanUser: getUser(id: 2) {
+        msg
       }
     }
     `,
-    // 查询传参必须在函数中传参，不可以从variables变量传参
-    variables: {
-      userId: 12345,
-      name: "y g s",
-    },
+    variables: {},
   },
 })
   .init()
