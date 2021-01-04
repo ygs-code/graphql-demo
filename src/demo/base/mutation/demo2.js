@@ -53,7 +53,7 @@ new CheckGraphql({
     `,
     variables: {
       userId: 123456,
-      name: "y g s",
+      name: "zhang san",
     },
   },
 })

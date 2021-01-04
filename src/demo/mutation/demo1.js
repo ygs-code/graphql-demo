@@ -60,7 +60,7 @@ new CheckGraphql({
     `,
     variables: {
       // userId: 123,
-      // name: "y g s ",
+      
     },
   },
 })

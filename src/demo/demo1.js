@@ -128,7 +128,7 @@ const resolvers = {
       // console.log('source==',source)
       // console.log('fieldASTs==',fieldASTs)
       return {
-        name: "hello my name is yao guan shou",
+        name: "hello my name is zhang san",
       };
     },
   },

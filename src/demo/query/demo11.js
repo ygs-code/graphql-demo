@@ -1,13 +1,8 @@
 import CheckGraphql from "../CheckGraphql";
 // chalk插件，用来在命令行中输入不同颜色的文字
 import chalk from "chalk";
-const parameter = {
-  id: "123",
-  name: "hi hello",
-};
-//查询传参
 new CheckGraphql({
-  context:{
+  context: {
     ctx: {
       request: {},
       respons: {},
@@ -15,17 +10,28 @@ new CheckGraphql({
     next: () => {},
   },
   serverSchema: {
-    schema: `
-     type User {
-       id: ID!
-       name: String!   
-     }
+    schemas: [
+      `
+  # 定义接口    
+  interface IUser{
+      id:ID!
+      name:String!
+      address:String!
+   }
+  # 实现接口
+  type User implements IUser {
+   id: ID!
+   name: String! 
+   address:String!
+   gender:Int!
+ }
 
-    extend type Query {
-      getUser(id:String!,name:String!): User
-    }
-    
+ extend type Query {
+   getUser: User  
+ }
     `,
+    ],
+    schema: ` `,
     resolvers: {
       Mutation: {},
       Subscription: {},
@@ -35,10 +41,12 @@ new CheckGraphql({
           console.log("parameter==", parameter);
           // console.log('source==',source)
           // console.log('fieldASTs==',fieldASTs)
-          return parameter;
-          // return {
-          //   name: "hello my name is zhang san ",
-          // };
+          return {
+            id: "123",
+            name: "hello my name is zhang san",
+            address: "广东",
+            gender:1
+          };
         },
       },
     },
@@ -46,16 +54,15 @@ new CheckGraphql({
   clientSchema: {
     schema: `
     {
-      getUser (id:"${parameter.id}",name:"${parameter.name}") {
-         name
+      getUser { 
          id
+         name
+         address
+         gender
       }
     }
     `,
-    // 查询传参必须在函数中传参，不可以从variables变量传参
-    // variables: {
-    //   name:'你好1'
-    // },
+    variables: {},
   },
 })
   .init()
@@ -63,7 +70,7 @@ new CheckGraphql({
     console.log("data==", data);
   })
   .catch((error) => {
-    console.log("error=", chalk.red(error));
+    // console.log("error=", chalk.red(error));
   });
 
 export default {};

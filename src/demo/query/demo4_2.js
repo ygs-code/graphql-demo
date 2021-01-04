@@ -44,7 +44,7 @@ new CheckGraphql({
           // console.log('source==',source)
           // console.log('fieldASTs==',fieldASTs)
           return {
-            name: "y g s",
+            name: "zhang san",
             address: "guang xi ",
           };
         },
@@ -58,7 +58,7 @@ new CheckGraphql({
           // console.log('source==',source)
           // console.log('fieldASTs==',fieldASTs)
           return {
-            name: "y g s",
+            name: "zhang san",
             address: "guang xi ",
           };
         },
@@ -69,7 +69,7 @@ new CheckGraphql({
           // console.log('source==',source)
           // console.log('fieldASTs==',fieldASTs)
           return {
-            name: "y g s",
+            name: "zhang san",
             address: "guang xi ",
           };
         },

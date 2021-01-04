@@ -90,7 +90,7 @@ class UpperCaseDirective extends SchemaDirectiveVisitor {
     `,
     variables: {   // 客户端 发送参数
       // userId: 123,
-      // name: "y g s ",
+      
     },
   },
 }
@@ -129,9 +129,26 @@ class CheckGraphql {
   `;
 
     let {
-      serverSchema: { schema: serverSchema = "", resolvers = {} } = {},
+      serverSchema: {
+        schema: serverSchema = "",
+        schemas = [],
+        resolvers = {},
+      } = {},
       clientSchema: { schema: clientSchema = "", variables = {} } = {},
     } = options;
+    if (schemas.length >= 1 && serverSchema.trim()) {
+      throw new Error(
+        chalk.red(
+          "serverSchema的schemas与schema参数只能二选一，只能传递其中一个。"
+        )
+      );
+    }
+    if (schemas.length >= 1) {
+      serverSchema = schemas.reduce((acc, next) => {
+        acc += next;
+        return acc;
+      }, "");
+    }
     serverSchema = ` ${serverRootSchema} \n ${serverSchema}`;
 
     this.options = {
@@ -159,8 +176,17 @@ class CheckGraphql {
   validateSeverSchema = async () => {
     let {
       directiveResolvers = {},
-      serverSchema: { schema: serverSchema = "", resolvers = {} } = {},
-      clientSchema: { schema: clientSchema = "", variables = {} } = {},
+      schemaDirectives = {},
+      serverSchema: {
+        schema: serverSchema = "",
+        schemas = [],
+        resolvers = {},
+      } = {},
+      clientSchema: {
+        schema: clientSchema = "",
+
+        variables = {},
+      } = {},
     } = this.options;
 
     try {
@@ -170,20 +196,21 @@ class CheckGraphql {
         throw validateSeverSchemaInfo;
       }
 
+      const typeDefs = schemas.length
+        ? schemas.map((item) => gql(item))
+        : [gql(serverSchema)];
       // 验证 SeverSchema
       this.serverSchema = makeExecutableSchema({
-        typeDefs: [gql(serverSchema)],
+        typeDefs,
         resolvers, // 可以做验证resolvers 中 Mutation，Subscription，Query
         // 4. 將 schema 的 directive 與實作連接並傳進 ApolloServer。
-        directiveResolvers,
-        // schemaDirectives: {
-        //   upper: UpperCaseDirective,
-        // },
+        directiveResolvers, // 自定义指令
+        schemaDirectives, // 自定义指令
       });
       console.log(chalk.rgb(36, 114, 199)("服务器schema验证通过"));
     } catch (error) {
-      throw "服务器schema验证失败:" + error;
-      //   console.error(chalk.red("服务器SeverSchema验证失败:", error));
+      console.error(chalk.red("服务器schema验证失败:", error));
+      throw new Error(chalk.red("服务器schema验证失败:" + error));
     }
   };
 
@@ -199,8 +226,8 @@ class CheckGraphql {
       this.documentAST = parse(source);
       console.log(chalk.rgb(36, 114, 199)("验证客户端schema通过"));
     } catch (syntaxError) {
-      //   console.error(chalk.red("验证客户端schema失败:", syntaxError));
-      throw "验证客户端schema失败:" + syntaxError;
+      console.error(chalk.red("验证客户端schema失败:", syntaxError));
+      throw new Error(chalk.red("验证客户端schema失败:" + syntaxError));
     }
   };
 
@@ -223,13 +250,15 @@ class CheckGraphql {
         chalk.rgb(36, 114, 199)("服务端的schema和客户端的schema一起验证通过")
       );
     } catch (syntaxError) {
-      //   console.error(
-      //     "服务端的schema和客户端的schema 一起验证失败:",
-      //     syntaxError
-      //   );
-      throw "服务端的schema和客户端的schema一起验证失败:" + syntaxError;
+      console.error(
+        chalk.red("服务端的schema和客户端的schema一起验证失败:", syntaxError)
+      );
+      throw new Error(
+        chalk.red("服务端的schema和客户端的schema一起验证失败:" + syntaxError)
+      );
     }
   };
+  // 客户端Schema和请求参数与服务器的Schema校验
   validateGraphql = async () => {
     let {
       returnFirst = false,
@@ -237,7 +266,7 @@ class CheckGraphql {
       serverSchema: { schema: serverSchema = "", resolvers = {} } = {},
       clientSchema: { schema: clientSchema = "", variables = {} } = {},
     } = this.options;
-    // return
+
     try {
       // 校验客户端Schema请求参数与服务器的Schema是否匹配
       const value = await graphql(
@@ -271,7 +300,16 @@ class CheckGraphql {
           }
         : data;
     } catch (errors) {
-      throw "graphql验证失败 errors:" + errors;
+      console.error(
+        chalk.red(
+          "客户端Schema和请求参数与服务器的Schema校验失败errors:" + errors
+        )
+      );
+      throw new Error(
+        chalk.red(
+          "客户端Schema和请求参数与服务器的Schema校验失败errors:" + errors
+        )
+      );
     }
   };
 }

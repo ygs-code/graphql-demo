@@ -2,7 +2,7 @@ import CheckGraphql from "../CheckGraphql";
 // chalk插件，用来在命令行中输入不同颜色的文字
 import chalk from "chalk";
 new CheckGraphql({
-  context:{
+  context: {
     ctx: {
       request: {},
       respons: {},
@@ -10,17 +10,28 @@ new CheckGraphql({
     next: () => {},
   },
   serverSchema: {
-    schema: `
-     type User {
-      id: ID
-      name: String  
-    }
+    //输入类型
+    schemas: [
+      `
+      #定义输入类型
+       input UserInput {
+         account: String!
+         password: String!
+       }
 
-    extend type Query {
-      getUser: User  
-    }
-    
-    `,
+       type User{
+          id : ID!
+          email : String!
+          name : String!
+          phone: String!
+        }
+
+        extend type Query {
+          getUser(user:UserInput!):User
+        }
+     `,
+    ],
+    schema: ` `,
     resolvers: {
       Mutation: {},
       Subscription: {},
@@ -31,8 +42,10 @@ new CheckGraphql({
           // console.log('source==',source)
           // console.log('fieldASTs==',fieldASTs)
           return {
-            id: "123",
-            name: "hello my name is zhang san",
+            id: 1,
+            email: "281113270@qq.com",
+            name: "张三",
+            phone: '18529531779',
           };
         },
       },
@@ -40,14 +53,21 @@ new CheckGraphql({
   },
   clientSchema: {
     schema: `
-    {
-      getUser {
-         name
-         id
+    query($user:UserInput!){
+      getUser(user:$user){
+        id 
+        email 
+        name 
+        phone 
       }
     }
     `,
-    variables: {},
+    variables: {
+      user:{
+        account: "abc",
+        password: "123456"
+      }
+    },
   },
 })
   .init()
@@ -55,7 +75,7 @@ new CheckGraphql({
     console.log("data==", data);
   })
   .catch((error) => {
-    console.log("error=", chalk.red(error));
+    // console.log("error=", chalk.red(error));
   });
 
 export default {};

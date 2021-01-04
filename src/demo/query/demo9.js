@@ -9,24 +9,10 @@ const parameter = {
   name: "hi hello",
 };
 
-//服务端创建指令
-const directiveResolvers = {
-  // 感觉只能做中间件拦截
-  upper: (next, source, { role }, ctx) => {
-    // console.log('next==',next)
-    // console.log('source==',source)
-    // console.log('role==',role)
-    // console.log('ctx==',ctx)
-    // 这里可以做字段中间件拦截器
-    console.log("这里可以做字段中间件拦截器");
-    return next();
-    //  throw new Error(`Must have role: `)
-  },
-};
-
+ 
 //查询传参
 new CheckGraphql({
-  directiveResolvers,
+  // directiveResolvers,
   context: {
     ctx: {
       request: {},
@@ -124,7 +110,7 @@ new CheckGraphql({
     `,
     // 查询传参必须在函数中传参，不可以从variables变量传参
     variables: {
-      name: 'y g s',
+      name: 'zhang san',
     },
   },
 })

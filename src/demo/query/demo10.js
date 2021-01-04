@@ -9,29 +9,7 @@ const parameter = {
   name: "hi hello",
 };
 
-// const Bonus = new GraphQLEnumType({
-//   name: "Bonus",
-//   values: {
-//     BIG: {
-//       value: "Big",
-//     },
-//     SMALL: {
-//       value: "Small",
-//     },
-//   },
-// });
-
-// const Gender = new GraphQLEnumType({
-//   name: "Gender",
-//   values: {
-//     MALE: {
-//       value: "MALE",
-//     },
-//     FEMALE: {
-//       value: "FEMALE",
-//     },
-//   },
-// });
+ 
 
 //查询传参
 new CheckGraphql({
@@ -99,7 +77,7 @@ new CheckGraphql({
     `,
     // 查询传参必须在函数中传参，不可以从variables变量传参
     // variables: {
-    //   name: 'y g s',
+    //   name: 'zhang san',
     // },
   },
 })

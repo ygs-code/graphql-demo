@@ -56,7 +56,7 @@ new CheckGraphql({
     // 查询传参必须在函数中传参，不可以从variables变量传参
     variables: {
       userId: 12345,
-      name: "y g s",
+      name: "zhang san",
     },
   },
 })

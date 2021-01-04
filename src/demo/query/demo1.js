@@ -1,28 +1,16 @@
 import CheckGraphql from "../CheckGraphql";
 // chalk插件，用来在命令行中输入不同颜色的文字
 import chalk from "chalk";
-const parameter = {
-  id: "123",
-  name: "hi hello",
-};
-//查询传参
 new CheckGraphql({
-  context:{
-    ctx: {
-      request: {},
-      respons: {},
-    },
-    next: () => {},
-  },
   serverSchema: {
     schema: `
      type User {
-       id: ID!
-       name: String!   
-     }
+      id: ID
+      name: String  
+    }
 
     extend type Query {
-      getUser(id:String!,name:String!): User
+      getUser: User  
     }
     
     `,
@@ -35,10 +23,10 @@ new CheckGraphql({
           console.log("parameter==", parameter);
           // console.log('source==',source)
           // console.log('fieldASTs==',fieldASTs)
-          return parameter;
-          // return {
-          //   name: "hello my name is zhang san ",
-          // };
+          return {
+            id: "123",
+            name: "hello my name is zhang san ",
+          };
         },
       },
     },
@@ -46,16 +34,13 @@ new CheckGraphql({
   clientSchema: {
     schema: `
     {
-      getUser (id:"${parameter.id}",name:"${parameter.name}") {
+      getUser {
          name
          id
       }
     }
     `,
-    // 查询传参必须在函数中传参，不可以从variables变量传参
-    // variables: {
-    //   name:'你好1'
-    // },
+    variables: {},
   },
 })
   .init()

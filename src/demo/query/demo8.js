@@ -1,4 +1,19 @@
 import CheckGraphql from "../CheckGraphql";
+// import gql from "graphql-tag";
+import { ApolloServer, gql, SchemaDirectiveVisitor } from "apollo-server";
+import {
+  graphql,
+  Source,
+  validateSchema,
+  parse,
+  validate,
+  execute,
+  formatError,
+  getOperationAST,
+  specifiedRules,
+  buildSchema,
+  defaultFieldResolver,
+} from "graphql";
 // chalk插件，用来在命令行中输入不同颜色的文字
 import chalk from "chalk";
 
@@ -8,25 +23,32 @@ const parameter = {
 };
 
 
-//服务端创建指令
-const directiveResolvers = {
-  // 感觉只能做中间件拦截
-  upper: (next, source, {role}, ctx) => {
-    // console.log('next==',next)
-    // console.log('source==',source)
-    // console.log('role==',role)
-    // console.log('ctx==',ctx)
-     // 这里可以做字段中间件拦截器
-     console.log('这里可以做字段中间件拦截器')
-     return next();
-    //  throw new Error(`Must have role: `)
-  },
-  
+// 2. Directive 實作
+// //服务端创建指令
+class UpperCaseDirective extends SchemaDirectiveVisitor {
+  // 2-1. ovveride field Definition 的實作
+  visitFieldDefinition(field) {
+    const { resolve = defaultFieldResolver } = field;
+    // 2-2. 更改 field 的 resolve function
+    field.resolve = async function(...args) {
+      // 2-3. 取得原先 field resolver 的計算結果 (因為 field resolver 傳回來的有可能是 promise 故使用 await)
+      const result = await resolve.apply(this, args);
+      // 2-4. 將得到的結果再做預期的計算 (toUpperCase)
+      if (typeof result === 'string') {
+        return result.toUpperCase();
+      }
+      console.log('result======',result)
+      // 2-5. 回傳最終值 (給前端)
+      return result;
+    };
+  }
 }
 
 //查询传参
 new CheckGraphql({
-  directiveResolvers,
+  schemaDirectives:{
+    upper: UpperCaseDirective
+  },
   context:{
     ctx: {
       request: {},
