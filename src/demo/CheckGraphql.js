@@ -1,5 +1,5 @@
-// import gql from "graphql-tag";
-import { ApolloServer, gql, SchemaDirectiveVisitor } from "apollo-server";
+import gql from "graphql-tag";
+// import { ApolloServer, gql, SchemaDirectiveVisitor } from "apollo-server";
 // chalk插件，用来在命令行中输入不同颜色的文字
 import chalk from "chalk";
 import {
@@ -19,25 +19,25 @@ import { makeExecutableSchema } from "graphql-tools";
 import requireGraphQLFile from 'require-graphql-file'
 
 // 2. Directive 實作
-class UpperCaseDirective extends SchemaDirectiveVisitor {
-  // 2-1. ovveride field Definition 的實作
-  visitFieldDefinition(field) {
-    console.log("field======", field);
-    const { resolve = defaultFieldResolver } = field;
-    // 2-2. 更改 field 的 resolve function
-    field.resolve = async function (...args) {
-      // 2-3. 取得原先 field resolver 的計算結果 (因為 field resolver 傳回來的有可能是 promise 故使用 await)
-      const result = await resolve.apply(this, args);
-      // 2-4. 將得到的結果再做預期的計算 (toUpperCase)
-      if (typeof result === "string") {
-        return result.toUpperCase();
-      }
-      console.log("result======", result);
-      // 2-5. 回傳最終值 (給前端)
-      return result;
-    };
-  }
-}
+// class UpperCaseDirective extends SchemaDirectiveVisitor {
+//   // 2-1. ovveride field Definition 的實作
+//   visitFieldDefinition(field) {
+//     console.log("field======", field);
+//     const { resolve = defaultFieldResolver } = field;
+//     // 2-2. 更改 field 的 resolve function
+//     field.resolve = async function (...args) {
+//       // 2-3. 取得原先 field resolver 的計算結果 (因為 field resolver 傳回來的有可能是 promise 故使用 await)
+//       const result = await resolve.apply(this, args);
+//       // 2-4. 將得到的結果再做預期的計算 (toUpperCase)
+//       if (typeof result === "string") {
+//         return result.toUpperCase();
+//       }
+//       console.log("result======", result);
+//       // 2-5. 回傳最終值 (給前端)
+//       return result;
+//     };
+//   }
+// }
 
 /*
 
@@ -45,7 +45,7 @@ class UpperCaseDirective extends SchemaDirectiveVisitor {
 
 {  
   returnFirst:false, //是 graphql 查询时候返回参数，是否取第一个，如果是true 那么客户端不能使用别名，也不能多接口方法查询，默认是false
-  context:{  //这个参数是node 上下文 可以传递request，respons，next等
+  rootValue:{  //这个参数是node 上下文 可以传递request，respons，next等
     ctx: {
       request: {},
       respons: {},
@@ -263,17 +263,19 @@ class CheckGraphql {
   validateGraphql = async () => {
     let {
       returnFirst = false,
-      context = {},
+      rootValue = {},
       serverSchema: { schema: serverSchema = "", resolvers = {} } = {},
       clientSchema: { schema: clientSchema = "", variables = {} } = {},
     } = this.options;
 
     try {
       // 校验客户端Schema请求参数与服务器的Schema是否匹配
+      // console.log('  this.serverSchema=',  this.serverSchema)
+      console.log('clientSchema=',  clientSchema)
       const value = await graphql(
         this.serverSchema, //加载服务端 schema
         clientSchema,
-        context,
+        rootValue,
         {
           //需要再次加载resolvers
           ...resolvers.Mutation,

@@ -1,73 +1,177 @@
 /*
- * @Date: 2022-05-20 14:22:51
+ * @Date: 2022-05-20 15:51:10
  * @Author: Yao guan shou
  * @LastEditors: Yao guan shou
- * @LastEditTime: 2022-05-20 16:34:24
- * @FilePath: /graphql-demo/src/demo/GraphQLModules/index.js
- * @Description: 
+ * @LastEditTime: 2022-05-20 16:28:48
+ * @FilePath: /graphql-demo/src/demo/GraphQLModules/index2.js
+ * @Description:
  */
-import { createApplication } from 'graphql-modules'  
+import express from 'express';
+import { getGraphQLParameters, processRequest } from 'graphql-helix';
+import bodyParser from 'body-parser';
+// import graphql from 'graphql';
 import {
     graphql,
     Source,
     validateSchema,
     parse,
     validate,
-    // execute,
+    execute,
     formatError,
     getOperationAST,
     specifiedRules,
     buildSchema,
     defaultFieldResolver,
-  } from "graphql";
-import { UserModule } from './user'
-import { getGraphQLParameters, processRequest } from 'graphql-helix'
-import { application } from './application'
-import express from 'express'
-import {graphqlHTTP} from './express-graphql'
+} from 'graphql';
+import { application } from './application';
+import { graphqlHTTP } from './express-graphql';
 
-console.log('graphqlHTTP=====',graphqlHTTP)
+console.log('graphql=', graphql);
+let executeFn = application.createExecution();
+const schema = application.schema;
 
+// const { query, variables, operationName } = {
+//     query: `
+//     query{
+//       getLogistics {
+//        name
+//        id
+//     }
+//   }
+//   `,
+//     variables: {},
+//     // operationName: 'getUser',
+// };
 
-const execute = application.createExecution()
-const schema = application.schema
+async function test(parameters) {
+    const { query, variables, operationName } = parameters;
 
-const server = express() 
+    // Validate Schema 验证服务端Schema
+    const schemaValidationErrors = validateSchema(schema);
+    if (schemaValidationErrors.length > 0) {
+        // Return 500: Internal Server Error if invalid schema.
+        throw 'GraphQL schema validation error.';
+    }
 
-server.use(
-  '/',
-  graphqlHTTP({
-    schema,
-    customExecuteFn: execute,
-    graphiql: true
-  })
-)
+    const parseFn = parse;
+    const validateFn = validate;
+    executeFn = executeFn ? executeFn : execute;
+    const validationRules = [];
+    // Parse source to AST, reporting any syntax error.
+    let documentAST;
+    try {
+        // 验证客户端Schema
+        documentAST = parseFn(new Source(query, 'GraphQL request'));
+    } catch (syntaxError) {
+        // Return 400: Bad Request if any syntax errors errors exist.
+        throw 'GraphQL syntax error.';
+    }
 
-server.listen(7000, () => {
-  console.log(`🚀 Server ready at http://localhost:7000/`)
-})
+    // Validate AST, reporting any errors.
+    // 服务端和客户端一起验证
+    const validationErrors = validateFn(schema, documentAST, [
+        ...specifiedRules,
+        ...validationRules,
+    ]);
 
-// // const { operationName, query, variables } = getGraphQLParameters(request)
-// const result =  processRequest({
-//     operationName:'updateUser',
-//     query:`
-//     mutation {
-//       # 没有参数不能写括号
-//       updateUser{
-//         id
-//         name
-//       }
-//     }`,
-//     variables:{},
-//     request:{
-//         setCooket:()=>{}
-//     },
-//     schema: application.schema,
-//     execute: application.createExecution(),
-//     subscribe: application.createSubscription()
-//   })
+    if (validationErrors.length > 0) {
+        // Return 400: Bad Request if any validation errors exist.
+        throw 'GraphQL validation error.';
+    }
 
-// console.log('result======',result) 
+    // Determine if this GET request will perform a non-query.
+    // const operationAST = graphql_1.getOperationAST(documentAST, operationName);
 
+    let result = {};
 
- 
+    // Perform the execution, reporting any errors creating the context.
+    try {
+        console.log('executeFn=====', executeFn);
+        console.log('operationName=====', operationName);
+        result = await executeFn({
+            schema,
+            document: documentAST,
+            rootValue: {
+                req: {
+                    setCooket: () => {},
+                },
+            },
+            contextValue: {},
+            variableValues: variables,
+            // operationName,
+            // fieldResolver,
+            // typeResolver,
+        });
+
+        // console.log('result=====', result);
+    } catch (contextError) {
+        console.log('contextError=====', contextError);
+        // Return 400: Bad Request if any execution context errors exist.
+        throw 'GraphQL execution context error.';
+    }
+    // result.then((value) => {
+    //     console.log('value=======', value);
+    // });
+    return result;
+}
+
+test({
+    query: `
+  query{
+    getUser {
+     name
+     id
+  }
+}
+`,
+    variables: {},
+    operationName: 'getUser',
+}).then((value) => {
+    console.log('getUser=======', value);
+});
+
+test({
+    query: `
+  query{
+    getUser {
+     name
+     id
+     adderss
+  }
+}
+`,
+    variables: {},
+    operationName: 'getUser',
+}).then((value) => {
+    console.log('getUser=======', value);
+});
+
+test({
+    query: `
+  query{
+    getLogistics {
+     name
+     id
+  }
+}
+`,
+    variables: {},
+    operationName: 'getLogistics',
+}).then((value) => {
+    console.log('getLogistics=======', value);
+});
+
+test({
+    query: `
+  query{
+    getDiscount {
+     name
+     id
+  }
+}
+`,
+    variables: {},
+    operationName: 'getDiscount',
+}).then((value) => {
+    console.log('getDiscount=======', value);
+});

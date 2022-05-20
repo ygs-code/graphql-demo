@@ -13,7 +13,7 @@ const parameter = {
 //查询传参
 new CheckGraphql({
   // directiveResolvers,
-  context: {
+  rootValue: {
     ctx: {
       request: {},
       respons: {},

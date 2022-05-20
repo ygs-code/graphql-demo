@@ -6,57 +6,168 @@
  * @FilePath: /graphql-demo/src/demo/GraphQLModules/index2.js
  * @Description:
  */
-import express from 'express'
-import { getGraphQLParameters, processRequest } from 'graphql-helix'
-import bodyParser from 'body-parser'
-import { application } from './application'
+import { UserModule } from './user';
+import { UserModule2 } from './user2';
+import { MarketingModule } from './marketing';
+import { LogisticsModule } from './logistics';
+import CheckGraphql from './CheckGraphql';
 
-const app = express()
-// app.use(express.json())
-let port = 7000
-console.log('application=', application)
-app.use(express.urlencoded({extended:false}))
+let $checkGraphql = new CheckGraphql({
+    modules: [UserModule, UserModule2, MarketingModule, LogisticsModule],
+});
 
-// parse application/x-www-form-urlencoded
-// app.use(bodyParser.urlencoded({ extended: false }))
+$checkGraphql.validateSeverSchema();
 
-// // parse application/json
-// app.use(bodyParser.json())
+async function test(parameters) {
+    // return new CheckGraphql({
+    //     modules: [UserModule, UserModule2, MarketingModule, LogisticsModule],
+    // }).init(parameters);
 
-app.use('/graphql', async (req, res) => {
-  const request = {
-    body: {},
-    headers: req.headers,
-    method: req.method,
-    query: req.body.query,
+    const { clientSchema } = parameters;
+    let documentAST = await $checkGraphql.validateClientSchema(parameters);
+
+    await $checkGraphql.validateSeverClientSchema({
+        documentAST,
+        clientSchema,
+    });
+    return await $checkGraphql.validateGraphql({
+        ...parameters,
+        documentAST,
+    });
+}
+
+test({
+    rootValue: {
+        ctx: {
+            request: {
+                setCookie() {},
+            },
+        },
+        next: () => {},
+    },
+    clientSchema: {
+        schema: `
+    query{
+      getUser {
+       name
+       id
+    }
   }
+  `,
+        variables: {},
+        operationName: 'getUser',
+    },
+}).then((data) => {
+    console.log('getUser======', data);
+});
 
-  console.log('req.body=',  req.body.query)
-  console.log('req.query=', req.query) 
-  //  console.log('req.query=',req)
+const parameter = {
+    id: 123,
+    name: '更新用户',
+};
+test({
+    rootValue: {
+        ctx: {
+            request: {
+                setCookie() {},
+            },
+        },
+        next: () => {},
+    },
+    clientSchema: {
+        schema: `
+        mutation {
+          updateUser(id:${parameter.id}, name:"${parameter.name}") {
+            name
+            id
+          }
+        }
+        `,
+        variables: {
+            userId: 123456,
+            name: 'zhang san',
+        },
+        operationName: 'updateUser',
+    },
+}).then((data) => {
+    console.log('updateUser======', data);
+});
 
-  const { operationName, query, variables } = getGraphQLParameters(request)
+test({
+    rootValue: {
+        ctx: {
+            request: {
+                setCookie() {},
+            },
+        },
+        next: () => {},
+    },
+    clientSchema: {
+        schema: `
+        mutation($id: ID! $name: String!) {
+          updateDiscount(id: $id name: $name) {
+            name
+            id
+          }
+        }
+        `,
+        variables: {
+            id: 123456,
+            name: 'zhang san',
+        },
+        operationName: 'updateDiscount',
+    },
+}).then((data) => {
+    console.log('updateDiscount======', data);
+});
 
-  console.log('req.body.operationName=',req.body.operationName)
-  console.log('req.body.query=',req.body.query)
-  console.log('variables=',variables)
+// test({
+//     clientSchema: {
+//         schema: `
+//     query{
+//         getUserTow {
+//        name
+//        id
+//     }
+//   }
+//   `,
+//         variables: {},
+//         operationName: 'getUserTow',
+//     },
+// }).then((data) => {
+//     console.log('getUserTow======', data);
+// });
 
-  const result = await processRequest({
-    operationName:req.body.operationName,
-    query:req.body.query,  //
-    variables,
-    request,
-    schema: application.schema,
-    execute: application.createExecution(),
-    subscribe: application.createSubscription(),
-  })
-  console.log('result=',result)
+// test({
+//     clientSchema: {
+//         schema: `
+//         query{
+//             getLogistics {
+//              name
+//              id
+//           }
+//         }
+//   `,
+//         variables: {},
+//         operationName: 'getLogistics',
+//     },
+// }).then((data) => {
+//     console.log('getLogistics======', data);
+// });
 
-  result.headers.forEach(({ name, value }) => res.setHeader(name, value))
-  res.status(result.status)
-  res.json(result.payload)
-})
-
-app.listen(port, () => {
-  console.log(`GraphQL server is running on port ${port}.`)
-})
+// test({
+//     clientSchema: {
+//         schema: `
+//         query{
+//             getDiscount {
+//              name
+//              id
+//           }
+//         }
+//   `,
+//         variables: {},
+//         operationName: 'getDiscount',
+//     },
+// }).then((data) => {
+//     console.log('getDiscount======', data);
+// });

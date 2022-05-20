@@ -12,7 +12,7 @@ const userFrag = gql`
 
 // 别名
 new CheckGraphql({
-  context: {
+  rootValue: {
     ctx: {
       request: {},
       respons: {},

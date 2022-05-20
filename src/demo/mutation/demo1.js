@@ -10,7 +10,7 @@ import CheckGraphql from "../CheckGraphql";
 // chalk插件，用来在命令行中输入不同颜色的文字
 import chalk from "chalk";
 new CheckGraphql({
-  context:{
+  rootValue:{
     ctx: {
       request: {},
       respons: {},

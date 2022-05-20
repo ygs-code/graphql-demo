@@ -7,7 +7,7 @@ const parameter = {
   name: "hi hello",
 };
 new CheckGraphql({
-  context:{
+  rootValue:{
     ctx: {
       request: {},
       respons: {},

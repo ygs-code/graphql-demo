@@ -49,7 +49,7 @@ new CheckGraphql({
   schemaDirectives:{
     upper: UpperCaseDirective
   },
-  context:{
+  rootValue:{
     ctx: {
       request: {},
       respons: {},

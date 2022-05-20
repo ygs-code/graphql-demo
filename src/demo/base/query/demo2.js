@@ -7,7 +7,7 @@ const parameter = {
 };
 //查询传参
 new CheckGraphql({
-  context:{
+  rootValue:{
     ctx: {
       request: {},
       respons: {},

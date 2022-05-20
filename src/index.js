@@ -6,4 +6,4 @@
  * @Description: In User Settings Edit
  * @FilePath: /graphql-demo/src/index.js
  */
-import "./demo/GraphQLModules/index";
+import "./demo/query/demo1";

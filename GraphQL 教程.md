@@ -21,6 +21,7 @@ http://spec.graphql.org/
 - https://blog.csdn.net/zhulin2609/article/details/71439542
 - https://spec.graphql.cn/
 - https://www.jianshu.com/p/3cc79d1f1394
+- https://www.graphql-modules.com/
 
 ## Java 使用例子
 

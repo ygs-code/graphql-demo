@@ -36,7 +36,7 @@ import chalk from "chalk";
 
 
 new CheckGraphql({
-  context: {
+  rootValue: {
     ctx: {
       request: {},
       respons: {},
@@ -68,12 +68,12 @@ new CheckGraphql({
     resolvers: {
       
       SearchResult: {
-        __resolveType(obj, context, info){
+        __resolveType(obj, rootValue, info){
           // console.log('__resolveType==')
           // console.log('obj==',obj)
-          // console.log('context==',context)
+          // console.log('rootValue==',rootValue)
           // console.log('info==',info)
-          // console.log(obj, context, info)
+          // console.log(obj, rootValue, info)
           // 根据unionName参数返回不同的union 模式  Person或者Photo
           if(obj.unionName=='Photo'){
             return 'Photo'

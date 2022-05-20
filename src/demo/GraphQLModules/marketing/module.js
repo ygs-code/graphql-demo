@@ -8,53 +8,53 @@
  */
 import { createModule, gql } from 'graphql-modules';
 
-export const UserModule = createModule({
-    id: 'user-module', // id不能与其他模块重名
+export const MarketingModule = createModule({
+    id: 'marketing-module', // id不能与其他模块重名
     dirname: __dirname,
     typeDefs: [
         gql`
-            type User {
+            schema {
+                query: Query
+                mutation: Mutation
+                subscription: Subscription
+            }
+            type Discount {
                 id: ID
                 name: String
             }
 
             extend type Query {
-                getUser: User
+                getDiscount: Discount
             }
 
-            type User {
-                name: String!
-                id: ID!
-            }
-            # 不管前端从variables传参还是从函数调用中传参，这里接受参数不会变。
             extend type Mutation {
-                updateUser(id: ID, name: String!): User!
+                updateDiscount(id: ID!, name: String!): Discount!
             }
         `,
     ],
     // 这里并没有校验resolvers重复性，所以需要我们自己实现校验
     resolvers: {
         Mutation: {
-            updateUser(root, parameter, source, fieldASTs) {
+            updateDiscount(root, parameter, source, fieldASTs) {
                 console.log('root==', root);
                 console.log('parameter==', parameter);
-                const { name, id } = parameter;
+                const { id } = parameter;
                 return {
-                    name: '成功更新用户',
+                    name: '成功更新优惠券',
                     id,
                 };
             },
         },
         Subscription: {},
         Query: {
-            getUser: (root, parameter, source, fieldASTs) => {
+            getDiscount: (root, parameter, source, fieldASTs) => {
                 console.log('root==', root);
                 console.log('parameter==', parameter);
                 // console.log('source==',source)
                 // console.log('fieldASTs==',fieldASTs)
                 return {
                     id: '1',
-                    name: '用户1模块',
+                    name: '营销模块 恭喜你获得7折扣',
                 };
             },
         },
