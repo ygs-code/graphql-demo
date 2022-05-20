@@ -16,6 +16,7 @@ import {
   defaultFieldResolver,
 } from "graphql";
 import { makeExecutableSchema } from "graphql-tools";
+import requireGraphQLFile from 'require-graphql-file'
 
 // 2. Directive 實作
 class UpperCaseDirective extends SchemaDirectiveVisitor {
@@ -111,7 +112,7 @@ CheckGraphql 对象方法，可以做单元测试
 
 class CheckGraphql {
   constructor(options) {
-    const serverRootSchema = `
+    this.serverRootSchema = `
     type Query {
         dummy: String
     }
@@ -149,7 +150,7 @@ class CheckGraphql {
         return acc;
       }, "");
     }
-    serverSchema = ` ${serverRootSchema} \n ${serverSchema}`;
+    serverSchema = ` ${this.serverRootSchema} \n ${serverSchema}`;
 
     this.options = {
       ...options,
@@ -197,7 +198,7 @@ class CheckGraphql {
       }
 
       const typeDefs = schemas.length
-        ? schemas.map((item) => gql(item))
+        ? [this.serverRootSchema,schemas].map((item) => gql(item))
         : [gql(serverSchema)];
       // 验证 SeverSchema
       this.serverSchema = makeExecutableSchema({

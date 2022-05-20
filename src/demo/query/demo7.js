@@ -1,3 +1,11 @@
+/*
+ * @Author: your name
+ * @Date: 2020-12-30 18:01:15
+ * @LastEditTime: 2021-08-18 09:44:47
+ * @LastEditors: Please set LastEditors
+ * @Description: In User Settings Edit
+ * @FilePath: /graphql-demo/src/demo/query/demo7.js
+ */
 import CheckGraphql from "../CheckGraphql";
 // chalk插件，用来在命令行中输入不同颜色的文字
 import chalk from "chalk";
@@ -71,7 +79,7 @@ new CheckGraphql({
   clientSchema: {
     schema: `
     query ($id:ID){
-      hello(id:$id){
+      helloc{
          name
         friends  {
           name

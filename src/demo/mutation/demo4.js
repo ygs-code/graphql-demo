@@ -1,9 +1,9 @@
 /*
- * @Date: 2020-12-30 11:25:45
+ * @Date: 2022-05-20 12:27:51
  * @Author: Yao guan shou
  * @LastEditors: Yao guan shou
- * @LastEditTime: 2022-05-20 11:11:42
- * @FilePath: /graphql-demo/src/demo/mutation/demo1.js
+ * @LastEditTime: 2022-05-20 15:48:23
+ * @FilePath: /graphql-demo/src/demo/mutation/demo4.js
  * @Description: 
  */
 import CheckGraphql from "../CheckGraphql";
@@ -20,20 +20,14 @@ new CheckGraphql({
   serverSchema: {
     schema: `
 
-
- 
-
     type User {
-      name: String!   
+      name:String!
       id: ID!
     }
-
+    
     extend type Mutation {
-      updateUser: User
+      updateUser(userId: ID!, name: String!): User!
     }
-
-
-
     
     `,
     resolvers: {
@@ -41,11 +35,9 @@ new CheckGraphql({
         updateUser(root, parameter, source, fieldASTs) {
           console.log("root==", root);
           console.log("parameter==", parameter);
-          // console.log('source==',source)
-          // console.log('fieldASTs==',fieldASTs)
           return {
-            name: "你 好",
-            id: 123,
+            name: "你好",
+            id: "123",
           };
         },
       },
@@ -55,17 +47,19 @@ new CheckGraphql({
   },
   clientSchema: {
     schema: `
-    mutation {
-      # 没有参数不能写括号
-      updateUser{
-        id
+    mutation($userId: ID! $name: String!) {
+      updateUser(userId: $userId name: $name) {
         name
+        id
       }
     }
     `,
     variables: {
-      // userId: 123,
-      
+      data:{
+        userId: 123456,
+        name: "zhang san",
+      }
+
     },
   },
 })
