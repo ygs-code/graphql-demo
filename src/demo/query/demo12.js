@@ -1,4 +1,4 @@
-import CheckGraphql from "../CheckGraphql";
+import ValidateGraphql from "../ValidateGraphql";
 import {
   graphql,
   Source,
@@ -35,7 +35,7 @@ import chalk from "chalk";
 // });
 
 
-new CheckGraphql({
+new ValidateGraphql({
   rootValue: {
     ctx: {
       request: {},

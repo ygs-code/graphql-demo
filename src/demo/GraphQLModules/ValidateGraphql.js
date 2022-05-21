@@ -15,16 +15,14 @@ import {
     buildSchema,
     defaultFieldResolver,
 } from 'graphql';
-import { makeExecutableSchema } from 'graphql-tools';
-import { off } from 'process';
-import requireGraphQLFile from 'require-graphql-file';
+
 
 /*
 
  options 参数 说明
 
 
-let $checkGraphql = new CheckGraphql({
+let $ValidateGraphql = new ValidateGraphql({
     modules: [UserModule, UserModule2, MarketingModule, LogisticsModule],
 });
 
@@ -57,28 +55,28 @@ let $checkGraphql = new CheckGraphql({
   },
 }
 
-CheckGraphql 对象方法，可以做单元测试
+ValidateGraphql 对象方法，可以做单元测试
    集成调用    返回 promise 对象 获取数据  
-    new CheckGraphql({
+    new ValidateGraphql({
          modules: [UserModule, UserModule2, MarketingModule, LogisticsModule],
      }).init(parameters);
 
   高性能调用 
     这样做的好处就是只校验一次服务器的Schema 而上面每次调用接口都会校验一次服务器的Schema
-   let $checkGraphql = new CheckGraphql({
+   let $ValidateGraphql = new ValidateGraphql({
        modules: [UserModule, UserModule2, MarketingModule, LogisticsModule],
    });
 
-   $checkGraphql.validateSeverSchema();
+   $ValidateGraphql.validateSeverSchema();
  async function test(parameters) {
     const { clientSchema } = parameters;
-    let documentAST = await $checkGraphql.validateClientSchema(parameters);
+    let documentAST = await $ValidateGraphql.validateClientSchema(parameters);
 
-    await $checkGraphql.validateSeverClientSchema({
+    await $ValidateGraphql.validateSeverClientSchema({
         documentAST,
         clientSchema,
     });
-    return await $checkGraphql.validateGraphql({
+    return await $ValidateGraphql.ValidateGraphql({
         ...parameters,
         documentAST,
     });
@@ -111,7 +109,7 @@ test({
      
 */
 
-class CheckGraphql {
+class ValidateGraphql {
     constructor(options = {}) {
         this.options = options;
     }
@@ -129,7 +127,7 @@ class CheckGraphql {
             clientSchema,
         });
         // 验证客户端请求与服务户端一起验证
-        const data = await this.validateGraphql({
+        const data = await this.ValidateGraphql({
             documentAST,
             clientSchema,
         });
@@ -446,4 +444,4 @@ class CheckGraphql {
     };
 }
 
-export default CheckGraphql;
+export default ValidateGraphql;

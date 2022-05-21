@@ -96,7 +96,7 @@ import requireGraphQLFile from 'require-graphql-file'
   },
 }
 
-CheckGraphql 对象方法，可以做单元测试
+ValidateGraphql 对象方法，可以做单元测试
   
     // 验证服务户端Schema
     await this.validateSeverSchema();
@@ -105,12 +105,12 @@ CheckGraphql 对象方法，可以做单元测试
     // 一起验证客户端服务端Schema
     await this.validateSeverClientSchema();
     // 验证客户端请求与服务户端一起验证 返回 查询resolvers参数
-    const data = await this.validateGraphql();
+    const data = await this.ValidateGraphql();
     //会执行以上几个方法并且返回查询resolvers参数
     async  init()
 */
 
-class CheckGraphql {
+class ValidateGraphql {
   constructor(options) {
     this.serverRootSchema = `
     type Query {
@@ -317,4 +317,4 @@ class CheckGraphql {
   };
 }
 
-export default CheckGraphql;
+export default ValidateGraphql;

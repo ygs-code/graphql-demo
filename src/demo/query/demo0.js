@@ -11,16 +11,13 @@ new ValidateGraphql({
     },
     serverSchema: {
         schema: `
-     type User {
-      id: ID
-      name: String  
-    }
-
-    extend type Query {
-      getUser: User  
-    }
     
-
+        type objName {
+            name:String
+        }
+        extend  type Query {
+            hello:objName
+        }
 
 
     `,
@@ -28,27 +25,18 @@ new ValidateGraphql({
             Mutation: {},
             Subscription: {},
             Query: {
-                getUser: (root, parameter, source, fieldASTs) => {
-                    console.log('root==', root);
-                    console.log('parameter==', parameter);
-                    // console.log('source==',source)
-                    // console.log('fieldASTs==',fieldASTs)
-                    return {
-                        id: '123',
-                        name: 'hello my name is zhang san ',
-                    };
-                },
+                hello: () => { return { name: 'hello world' } },
             },
         },
     },
     clientSchema: {
         schema: `
-    {
-      getUser {
-         name
-         id
-      }
-    }
+        {
+            hello {
+              name
+            }
+          }
+          
     `,
         variables: {},
     },

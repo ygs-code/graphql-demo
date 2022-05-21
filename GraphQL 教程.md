@@ -1146,6 +1146,51 @@ class UpperCaseDirective extends SchemaDirectiveVisitor {
 
 ## 数据类型
 
+## Type System
+
+几乎任何一门语言，都是具有类型的。GraphQL常用的类型有：
+
+- 标量类型
+- 列表和非空
+- 枚举类型
+- 对象类型
+- 接口
+- 联合类型
+- 输入类型 ...
+
+**标量类型** GraphQL 自带一组默认标量类型：
+
+- Int：有符号 32 位整数。
+- Float：有符号双精度浮点值。
+- String：UTF‐8 的字符序列。
+- Boolean：true或false。
+- ID：ID 标量类型表示一个唯一标识符，通常用以重新获取对象或者作为缓存中的键。ID 类型使用和 String 一样的方式序列化；
+
+**列表和非空** 默认情况下，每种类型都会返回null作为任何标量。与此相对的可以使用感叹号（!）表示非空类型。例如：String!表示非空字符串。 和大多数语言类似的，使用中括号来代表列表，例如：[Int]表示一个整型的列表。
+
+**枚举类型** [枚举类型](https://so.csdn.net/so/search?q=枚举类型&spm=1001.2101.3001.7020)是一种特殊的标量，它限制在一个特殊的可选值集合内。例如：
+
+```csharp
+enum Episode {
+  NEWHOPE
+  EMPIRE
+  JEDI
+}
+```
+
+这表示了无论在[schema](https://so.csdn.net/so/search?q=schema&spm=1001.2101.3001.7020)中哪里使用了Episode ，其返回值肯定是NEWHOPE、EMPIRE、JEDI三个值其中一个。（注意，各种语言实现的 GraphQL 服务会有其独特的枚举处理方式。但对于JavaScript 在ES5中没有支持，些枚举值可能就被内部映射成整数值。但这都是内部的细节，并不会影响使用。）
+
+**对象类型** GraphQL schema 中的最基本的组件是对象类型。它就表示你可以从服务上获取到什么类型的对象，以及这个对象有什么字段。例如：
+
+```haskell
+type Character {
+  name: String!
+  appearsIn: [Episode!]!
+}
+```
+
+ 
+
 ### 类型系统（Type System） 
 
 如果你之前见到过 GraphQL 查询，你就知道 GraphQL 查询语言基本上就是关于选择对象上的字段。因此，例如在下列查询中：

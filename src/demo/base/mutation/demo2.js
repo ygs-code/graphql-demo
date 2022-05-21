@@ -1,4 +1,4 @@
-import CheckGraphql from "../CheckGraphql";
+import ValidateGraphql from "../ValidateGraphql";
 // chalk插件，用来在命令行中输入不同颜色的文字
 import chalk from "chalk";
 // const userId=12345;
@@ -6,7 +6,7 @@ const parameter = {
   id: 123,
   name: "hi hello",
 };
-new CheckGraphql({
+new ValidateGraphql({
   rootValue:{
     ctx: {
       request: {},

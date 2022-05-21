@@ -6,7 +6,7 @@
  * @Description: In User Settings Edit
  * @FilePath: /graphql-demo/src/demo/query/demo7.js
  */
-import CheckGraphql from "../CheckGraphql";
+import ValidateGraphql from "../ValidateGraphql";
 // chalk插件，用来在命令行中输入不同颜色的文字
 import chalk from "chalk";
 const parameter = {
@@ -32,7 +32,7 @@ const directiveResolvers = {
 }
 
 //查询传参
-new CheckGraphql({
+new ValidateGraphql({
   directiveResolvers,
   rootValue:{
     ctx: {

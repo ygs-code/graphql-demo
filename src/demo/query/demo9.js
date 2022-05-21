@@ -1,4 +1,4 @@
-import CheckGraphql from "../CheckGraphql";
+import ValidateGraphql from "../ValidateGraphql";
 // chalk插件，用来在命令行中输入不同颜色的文字
 import chalk from "chalk";
 import { GraphQLScalarType } from "graphql";
@@ -11,7 +11,7 @@ const parameter = {
 
  
 //查询传参
-new CheckGraphql({
+new ValidateGraphql({
   // directiveResolvers,
   rootValue: {
     ctx: {

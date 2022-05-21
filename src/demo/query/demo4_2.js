@@ -1,4 +1,4 @@
-import CheckGraphql from "../CheckGraphql";
+import ValidateGraphql from "../ValidateGraphql";
 import gql from "graphql-tag";
 // chalk插件，用来在命令行中输入不同颜色的文字
 import chalk from "chalk";
@@ -11,7 +11,7 @@ const userFrag = gql`
 `;
 
 // 别名
-new CheckGraphql({
+new ValidateGraphql({
   rootValue: {
     ctx: {
       request: {},

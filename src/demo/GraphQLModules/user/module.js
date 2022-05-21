@@ -25,6 +25,7 @@ export const UserModule = createModule({
             type User {
                 name: String!
                 id: ID!
+                type:Int
             }
             # 不管前端从variables传参还是从函数调用中传参，这里接受参数不会变。
             extend type Mutation {
@@ -55,6 +56,8 @@ export const UserModule = createModule({
                 return {
                     id: '1',
                     name: '用户1模块',
+                    adderss: '用户模块1地址',
+                    type:1
                 };
             },
         },

@@ -10,27 +10,27 @@ import { UserModule } from './user';
 import { UserModule2 } from './user2';
 import { MarketingModule } from './marketing';
 import { LogisticsModule } from './logistics';
-import CheckGraphql from './CheckGraphql';
+import ValidateGraphql from './ValidateGraphql';
 
-let $checkGraphql = new CheckGraphql({
-    modules: [UserModule, UserModule2, MarketingModule, LogisticsModule],
+let $ValidateGraphql = new ValidateGraphql({
+    modules: [ UserModule2,UserModule, MarketingModule, LogisticsModule],
 });
 
-$checkGraphql.validateSeverSchema();
+$ValidateGraphql.validateSeverSchema();
 
 async function test(parameters) {
-    // return new CheckGraphql({
+    // return new ValidateGraphql({
     //     modules: [UserModule, UserModule2, MarketingModule, LogisticsModule],
     // }).init(parameters);
 
     const { clientSchema } = parameters;
-    let documentAST = await $checkGraphql.validateClientSchema(parameters);
+    let documentAST = await $ValidateGraphql.validateClientSchema(parameters);
 
-    await $checkGraphql.validateSeverClientSchema({
+    await $ValidateGraphql.validateSeverClientSchema({
         documentAST,
         clientSchema,
     });
-    return await $checkGraphql.validateGraphql({
+    return await $ValidateGraphql.validateGraphql({
         ...parameters,
         documentAST,
     });
@@ -51,6 +51,8 @@ test({
       getUser {
        name
        id
+       adderss
+
     }
   }
   `,
@@ -60,6 +62,36 @@ test({
 }).then((data) => {
     console.log('getUser======', data);
 });
+
+
+
+test({
+    rootValue: {
+        ctx: {
+            request: {
+                setCookie() {},
+            },
+        },
+        next: () => {},
+    },
+    clientSchema: {
+        schema: `
+    query{
+        getUserTow {
+       name
+       id
+       adderss
+       type
+    }
+  }
+  `,
+        variables: {},
+        operationName: 'getUserTow',
+    },
+}).then((data) => {
+    console.log('getUserTow======', data);
+});
+
 
 const parameter = {
     id: 123,
@@ -80,6 +112,7 @@ test({
           updateUser(id:${parameter.id}, name:"${parameter.name}") {
             name
             id
+            
           }
         }
         `,

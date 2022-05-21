@@ -11,44 +11,37 @@ new ValidateGraphql({
     },
     serverSchema: {
         schema: `
-     type User {
-      id: ID
-      name: String  
+  
+
+    extend type  Query {
+        rollDice(numDice: Int!, numSides: Int): [Int]
     }
-
-    extend type Query {
-      getUser: User  
-    }
-    
-
-
-
     `,
         resolvers: {
             Mutation: {},
             Subscription: {},
             Query: {
-                getUser: (root, parameter, source, fieldASTs) => {
-                    console.log('root==', root);
-                    console.log('parameter==', parameter);
-                    // console.log('source==',source)
-                    // console.log('fieldASTs==',fieldASTs)
-                    return {
-                        id: '123',
-                        name: 'hello my name is zhang san ',
-                    };
+                rollDice: function (root, parameter, source, fieldASTs) {
+                    const { numDice, numSides } = parameter;
+                    console.log('parameter=', parameter);
+                    var output = [];
+                    for (var i = 0; i < numDice; i++) {
+                        output.push(
+                            1 + Math.floor(Math.random() * (numSides || 6))
+                        );
+                    }
+                    return output;
                 },
             },
         },
     },
     clientSchema: {
         schema: `
-    {
-      getUser {
-         name
-         id
-      }
-    }
+        {
+            rollDice(numDice:3,numSides:6)
+          }
+          
+          
     `,
         variables: {},
     },

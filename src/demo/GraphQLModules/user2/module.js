@@ -13,24 +13,12 @@ export const UserModule2 = createModule({
     dirname: __dirname,
     typeDefs: [
         gql`
-            type Query {
-                dummy: String
-            }
-            type Mutation {
-                dummy: String
-            }
-            type Subscription {
-                dummy: String
-            }
-            schema {
-                query: Query
-                mutation: Mutation
-                subscription: Subscription
-            }
+
             type User {
                 id: ID
                 name: String
                 adderss: String!
+                type:Int!
             }
 
             extend type Query {
@@ -52,6 +40,7 @@ export const UserModule2 = createModule({
                     id: '2',
                     name: '用户2模块',
                     adderss: 'adderss',
+                    type:2
                 };
             },
         },

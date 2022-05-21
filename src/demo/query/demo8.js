@@ -1,4 +1,4 @@
-import CheckGraphql from "../CheckGraphql";
+import ValidateGraphql from "../ValidateGraphql";
 // import gql from "graphql-tag";
 import { ApolloServer, gql, SchemaDirectiveVisitor } from "apollo-server";
 import {
@@ -45,7 +45,7 @@ class UpperCaseDirective extends SchemaDirectiveVisitor {
 }
 
 //查询传参
-new CheckGraphql({
+new ValidateGraphql({
   schemaDirectives:{
     upper: UpperCaseDirective
   },

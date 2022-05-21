@@ -1,7 +1,7 @@
-import CheckGraphql from "../CheckGraphql";
+import ValidateGraphql from "../ValidateGraphql";
 // chalk插件，用来在命令行中输入不同颜色的文字
 import chalk from "chalk";
-new CheckGraphql({
+new ValidateGraphql({
   rootValue: {
     ctx: {
       request: {},
