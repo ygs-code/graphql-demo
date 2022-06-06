@@ -8,16 +8,11 @@
  */
 import { createModule, gql } from 'graphql-modules';
 
-export const UserModule = createModule({
+export const UserModule = {
     id: 'user-module', // id不能与其他模块重名
     dirname: __dirname,
     typeDefs: [
-        gql`
-            type User {
-                id: ID
-                name: String
-            }
-
+        `
             extend type Query {
                 getUser: User
             }
@@ -25,7 +20,8 @@ export const UserModule = createModule({
             type User {
                 name: String!
                 id: ID!
-                type:Int
+                type:Int,
+                address:String!
             }
             # 不管前端从variables传参还是从函数调用中传参，这里接受参数不会变。
             extend type Mutation {
@@ -43,6 +39,8 @@ export const UserModule = createModule({
                 return {
                     name: '成功更新用户',
                     id,
+                    type: 1,
+                    address: '中国广东深圳',
                 };
             },
         },
@@ -56,10 +54,10 @@ export const UserModule = createModule({
                 return {
                     id: '1',
                     name: '用户1模块',
-                    adderss: '用户模块1地址',
-                    type:1
+                    address: '中国广东深圳',
+                    type: 1,
                 };
             },
         },
     },
-});
+};

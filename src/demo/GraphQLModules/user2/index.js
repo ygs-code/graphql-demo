@@ -6,7 +6,6 @@
  * @FilePath: /graphql-demo/src/demo/GraphQLModules/user/index.js
  * @Description:
  */
-import { UserModule2 } from './module'
+import { UserModule2 } from './module';
 
-export { UserModule2 }
- 
+export default [UserModule2];

@@ -8,21 +8,21 @@
  */
 import { createModule, gql } from 'graphql-modules';
 
-export const UserModule2 = createModule({
+export const UserModule2 = {
     id: 'user2-module', // id不能与其他模块重名
     dirname: __dirname,
     typeDefs: [
-        gql`
-
-            type User {
+        `
+ 暗示的方式地方
+            type UserTow {
                 id: ID
                 name: String
-                adderss: String!
+                address: String!
                 type:Int!
             }
 
             extend type Query {
-                getUserTow: User
+                getUserTow: UserTow
             }
         `,
     ],
@@ -34,15 +34,15 @@ export const UserModule2 = createModule({
             getUserTow: (root, parameter, source, fieldASTs) => {
                 console.log('root==', root);
                 console.log('parameter==', parameter);
-                console.log('source==',source)
-                console.log('fieldASTs==',fieldASTs)
+                // console.log('source==',source)
+                // console.log('fieldASTs==',fieldASTs)
                 return {
                     id: '2',
                     name: '用户2模块',
-                    adderss: 'adderss',
+                    address: 'address',
                     type:2
                 };
             },
         },
     },
-});
+}

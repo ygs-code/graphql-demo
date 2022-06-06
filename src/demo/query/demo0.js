@@ -11,7 +11,7 @@ new ValidateGraphql({
     },
     serverSchema: {
         schema: `
-    
+         
         type objName {
             name:String
         }

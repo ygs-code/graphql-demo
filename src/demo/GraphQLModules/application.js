@@ -7,10 +7,10 @@
  * @Description:
  */
 import { createApplication } from 'graphql-modules';
-import { UserModule } from './user';
-import { UserModule2 } from './user2';
-import { MarketingModule } from './marketing';
-import { LogisticsModule } from './logistics';
+import UserModule from './user';
+import UserModule2 from './user2';
+import MarketingModule from './marketing';
+import LogisticsModule from './logistics';
 const {
     config: {
         id, // 模块id
@@ -24,7 +24,7 @@ const { Mutation = {}, Subscription = {}, Query = {} } = resolvers;
 
 // This is your application, it contains your GraphQL schema and the implementation of it.
 const application = createApplication({
-    modules: [MarketingModule, UserModule, UserModule2, LogisticsModule],
+    modules: [...MarketingModule, ...UserModule, ...UserModule2, ...LogisticsModule],
 });
 
 console.log('id=', id);

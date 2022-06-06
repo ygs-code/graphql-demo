@@ -1,5 +1,4 @@
 import { createModule, gql, createApplication } from 'graphql-modules';
-// import { createApplication } from 'graphql-modules';
 // chalk插件，用来在命令行中输入不同颜色的文字
 import chalk from 'chalk';
 import {
@@ -15,7 +14,6 @@ import {
     buildSchema,
     defaultFieldResolver,
 } from 'graphql';
-
 
 /*
 
@@ -56,33 +54,13 @@ let $ValidateGraphql = new ValidateGraphql({
 }
 
 ValidateGraphql 对象方法，可以做单元测试
-   集成调用    返回 promise 对象 获取数据  
-    new ValidateGraphql({
+   集成调用    返回 ValidateGraphql 实例
+    let  $ValidateGraphql = new ValidateGraphql({
          modules: [UserModule, UserModule2, MarketingModule, LogisticsModule],
-     }).init(parameters);
-
-  高性能调用 
-    这样做的好处就是只校验一次服务器的Schema 而上面每次调用接口都会校验一次服务器的Schema
-   let $ValidateGraphql = new ValidateGraphql({
-       modules: [UserModule, UserModule2, MarketingModule, LogisticsModule],
-   });
-
-   $ValidateGraphql.validateSeverSchema();
- async function test(parameters) {
-    const { clientSchema } = parameters;
-    let documentAST = await $ValidateGraphql.validateClientSchema(parameters);
-
-    await $ValidateGraphql.validateSeverClientSchema({
-        documentAST,
-        clientSchema,
-    });
-    return await $ValidateGraphql.ValidateGraphql({
-        ...parameters,
-        documentAST,
-    });
-}
-
-test({
+     })
+     
+     // 再调用获取校验数据
+  $ValidateGraphql.init({
     rootValue: {
         ctx: {
             request: {
@@ -97,6 +75,40 @@ test({
       getUser {
        name
        id
+       adderss
+
+    }
+  }
+  `,
+        variables: {},
+        operationName: 'getUser',
+    },
+});
+
+  高性能调用 
+    这样做的好处就是只校验一次服务器的Schema 而上面每次调用接口都会校验一次服务器的Schema
+     const $validateGraphql = validateGraphql({
+           modules: [UserModule2, UserModule, MarketingModule, LogisticsModule],
+      });
+
+
+$validateGraphql({
+    rootValue: {
+        ctx: {
+            request: {
+                setCookie() {},
+            },
+        },
+        next: () => {},
+    },
+    clientSchema: {
+        schema: `
+    query{
+      getUser {
+       name
+       id
+       adderss
+
     }
   }
   `,
@@ -106,6 +118,35 @@ test({
 }).then((data) => {
     console.log('getUser======', data);
 });
+
+$validateGraphql({
+    rootValue: {
+        ctx: {
+            request: {
+                setCookie() {},
+            },
+        },
+        next: () => {},
+    },
+    clientSchema: {
+        schema: `
+    query{
+        getUserTow {
+       name
+       id
+       adderss
+       type
+    }
+  }
+  `,
+        variables: {},
+        operationName: 'getUserTow',
+    },
+}).then((data) => {
+    console.log('getUserTow======', data);
+});
+
+ 
      
 */
 
@@ -118,7 +159,7 @@ class ValidateGraphql {
         // 验证resolvers是否有重复
         // await this.validateResolvers();
         // 验证服务户端Schema
-        await this.validateSeverSchema();
+        this.validateSeverSchemas();
         // 验证客户端Schema
         let documentAST = await this.validateClientSchema({ clientSchema });
         // 一起验证客户端服务端Schema
@@ -127,53 +168,31 @@ class ValidateGraphql {
             clientSchema,
         });
         // 验证客户端请求与服务户端一起验证
-        const data = await this.ValidateGraphql({
-            documentAST,
-            clientSchema,
-        });
+        const data = await this.ValidateGraphql(parameters);
         return data;
     }
 
     // 验证resolvers是否有重复
-    validateResolvers = async () => {
+    validateResolvers = () => {
         // this.options = {
         //     ...this.options,
         //     ...options,
         // };
         let { modules = [] } = this.options;
-        this.serverRootSchema = gql`
-            type Query {
-                dummy: String
-            }
-            type Mutation {
-                dummy: String
-            }
-            type Subscription {
-                dummy: String
-            }
-            schema {
-                query: Query
-                mutation: Mutation
-                subscription: Subscription
-            }
-        `;
 
         let cacheRecord = [];
+        let newModules = [];
 
         for (let [index, item] of modules.entries()) {
             const {
-                config: {
-                    id, // 模块id
-                    dirname, // 路劲
-                    typeDefs, //typeDefs
-                    resolvers = {},
-                } = {},
+                // config: {
+                id, // 模块id
+                dirname, // 路劲
+                typeDefs = [], //typeDefs
+                resolvers = {},
+                // } = {},
             } = item;
 
-            modules[index].config.typeDefs = [
-                this.serverRootSchema,
-                ...typeDefs,
-            ];
             const { Mutation = {}, Subscription = {}, Query = {} } = resolvers;
             let nowRecord = {
                 id, // 模块id
@@ -238,24 +257,81 @@ class ValidateGraphql {
                     nowRecord.Subscription.push(key);
                 }
             }
-
+            //创建模块Schema
+            newModules.push(createModule(this.validateSeverSchema(item)));
+            // 记录缓存
             cacheRecord.push(nowRecord);
         }
 
         this.options = {
             ...this.options,
-            modules,
+            modules: newModules,
         };
     };
 
+    //验证单个SeverSchema
+    validateSeverSchema = (config) => {
+        let {
+            typeDefs = [],
+            id, // id不能与其他模块重名
+            dirname,
+        } = config;
+
+        let serverRootSchema = `
+                    type Query {
+                        dummy: String
+                    }
+                    type Mutation {
+                        dummy: String
+                    }
+                    type Subscription {
+                        dummy: String
+                    }
+                    schema {
+                        query: Query
+                        mutation: Mutation
+                        subscription: Subscription
+                    }
+    `;
+
+        let serverSchema = serverRootSchema + typeDefs.join(' ');
+        try {
+            // 验证 SeverSchema
+            const validateSeverSchemaInfo = validateSchema(
+                buildSchema(serverSchema)
+            );
+            if (validateSeverSchemaInfo.length > 0) {
+                throw validateSeverSchemaInfo;
+            }
+
+            console.log(chalk.rgb(36, 114, 199)('服务器schema验证通过'));
+        } catch (error) {
+            console.error(
+                chalk.red(
+                    `服务器serverSchema,id为：${id}，路径为:${dirname}, schema验证失败，错误信息:${error}`
+                )
+            );
+            throw new Error(
+                chalk.red(
+                    `服务器serverSchema,id为：${id}，路径为:${dirname}, schema验证失败，错误信息:${error}`
+                )
+            );
+        }
+
+        config.typeDefs = typeDefs.map((item) => {
+            return gql(serverRootSchema + item);
+        });
+        return config;
+    };
+
     // 验证 服务器SeverSchema
-    validateSeverSchema = async (options = {}) => {
+    validateSeverSchemas = (options = {}) => {
         // this.options = {
         //     ...this.options,
         //     ...options,
         // };
 
-        await this.validateResolvers();
+        this.validateResolvers();
 
         let {
             modules = [],
@@ -266,7 +342,7 @@ class ValidateGraphql {
         this.application = createApplication({
             modules,
         });
-
+        // 获取验证函数
         this.executeFn = this.application.createExecution();
 
         this.options = {
@@ -278,9 +354,11 @@ class ValidateGraphql {
         };
 
         try {
+            // validateSchema(buildSchema(serverSchema));
             // 验证 SeverSchema
             const validateSeverSchemaInfo = validateSchema(
                 this.application.schema
+                // buildSchema(this.application.schema)
             );
             if (validateSeverSchemaInfo.length > 0) {
                 throw validateSeverSchemaInfo;
@@ -400,7 +478,6 @@ class ValidateGraphql {
 
         try {
             // 校验客户端Schema请求参数与服务器的Schema是否匹配
-
             const value = await this.executeFn({
                 schema: serverSchema,
                 document: documentAST,
@@ -443,5 +520,29 @@ class ValidateGraphql {
         }
     };
 }
+const validateGraphql = (options) => {
+    const { modules = [] } = options;
+    let $validateGraphql = new ValidateGraphql({
+        modules,
+    });
 
+    $validateGraphql.validateSeverSchemas();
+
+    return async (parameters) => {
+        const { clientSchema } = parameters;
+        let documentAST = await $validateGraphql.validateClientSchema(
+            parameters
+        );
+
+        await $validateGraphql.validateSeverClientSchema({
+            documentAST,
+            clientSchema,
+        });
+        return await $validateGraphql.validateGraphql({
+            ...parameters,
+            documentAST,
+        });
+    };
+};
+export { validateGraphql };
 export default ValidateGraphql;

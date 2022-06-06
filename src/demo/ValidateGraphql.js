@@ -189,25 +189,28 @@ class ValidateGraphql {
         variables = {},
       } = {},
     } = this.options;
-
+     console.log('serverSchema========',serverSchema)
     try {
       // 验证 SeverSchema
+      
       const validateSeverSchemaInfo = validateSchema(buildSchema(serverSchema));
+      console.log('validateSeverSchemaInfo=',validateSeverSchemaInfo)
+      console.log('validateSeverSchemaInfo=',validateSeverSchemaInfo)
       if (validateSeverSchemaInfo.length > 0) {
         throw validateSeverSchemaInfo;
       }
 
-      const typeDefs = schemas.length
-        ? [this.serverRootSchema,schemas].map((item) => gql(item))
-        : [gql(serverSchema)];
+      // const typeDefs = schemas.length
+      //   ? [this.serverRootSchema,schemas].map((item) => gql(item))
+      //   : [gql(serverSchema)];
       // 验证 SeverSchema
-      this.serverSchema = makeExecutableSchema({
-        typeDefs,
-        resolvers, // 可以做验证resolvers 中 Mutation，Subscription，Query
-        // 4. 將 schema 的 directive 與實作連接並傳進 ApolloServer。
-        directiveResolvers, // 自定义指令
-        schemaDirectives, // 自定义指令
-      });
+      // this.serverSchema = makeExecutableSchema({
+      //   typeDefs,
+      //   resolvers, // 可以做验证resolvers 中 Mutation，Subscription，Query
+      //   // 4. 將 schema 的 directive 與實作連接並傳進 ApolloServer。
+      //   directiveResolvers, // 自定义指令
+      //   schemaDirectives, // 自定义指令
+      // });
       console.log(chalk.rgb(36, 114, 199)("服务器schema验证通过"));
     } catch (error) {
       console.error(chalk.red("服务器schema验证失败:", error));

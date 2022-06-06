@@ -6,7 +6,6 @@
  * @FilePath: /graphql-demo/src/demo/GraphQLModules/user/index.js
  * @Description:
  */
-import { MarketingModule } from './module'
+import { MarketingModule } from './module';
 
-export { MarketingModule }
- 
+export default [MarketingModule];

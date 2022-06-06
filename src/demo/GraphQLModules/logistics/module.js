@@ -8,25 +8,11 @@
  */
 import { createModule, gql } from 'graphql-modules';
 
-export const LogisticsModule = createModule({
+export const LogisticsModule = {
     id: 'logistics-module',
     dirname: __dirname,
     typeDefs: [
-        gql`
-            type Query {
-                dummy: String
-            }
-            type Mutation {  
-                dummy: String
-            }
-            type Subscription {
-                dummy: String
-            }
-            schema {
-                query: Query
-                mutation: Mutation
-                subscription: Subscription
-            }
+        `
             type Logistics {
                 id: ID
                 name: String
@@ -53,4 +39,4 @@ export const LogisticsModule = createModule({
             },
         },
     },
-});
+}

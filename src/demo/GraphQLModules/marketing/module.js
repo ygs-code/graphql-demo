@@ -8,23 +8,18 @@
  */
 import { createModule, gql } from 'graphql-modules';
 
-export const MarketingModule = createModule({
+export const MarketingModule = {
     id: 'marketing-module', // id不能与其他模块重名
     dirname: __dirname,
     typeDefs: [
-        gql`
-            schema {
-                query: Query
-                mutation: Mutation
-                subscription: Subscription
-            }
+        `
             type Discount {
                 id: ID
                 name: String
             }
 
             extend type Query {
-                getDiscount: Discount
+                getDiscount: Discount 
             }
 
             extend type Mutation {
@@ -59,4 +54,4 @@ export const MarketingModule = createModule({
             },
         },
     },
-});
+}

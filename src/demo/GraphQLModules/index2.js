@@ -6,201 +6,172 @@
  * @FilePath: /graphql-demo/src/demo/GraphQLModules/index2.js
  * @Description:
  */
-import { UserModule } from './user';
-import { UserModule2 } from './user2';
-import { MarketingModule } from './marketing';
-import { LogisticsModule } from './logistics';
-import ValidateGraphql from './ValidateGraphql';
+import express from 'express';
+import { getGraphQLParameters, processRequest } from 'graphql-helix';
+import bodyParser from 'body-parser';
+// import graphql from 'graphql';
+import {
+    graphql,
+    Source,
+    validateSchema,
+    parse,
+    validate,
+    execute,
+    formatError,
+    getOperationAST,
+    specifiedRules,
+    buildSchema,
+    defaultFieldResolver,
+} from 'graphql';
+import { application } from './application';
+import { graphqlHTTP } from './express-graphql';
 
-let $ValidateGraphql = new ValidateGraphql({
-    modules: [ UserModule2,UserModule, MarketingModule, LogisticsModule],
-});
+console.log('graphql=', graphql);
+let executeFn = application.createExecution();
+const schema = application.schema;
 
-$ValidateGraphql.validateSeverSchema();
-
-async function test(parameters) {
-    // return new ValidateGraphql({
-    //     modules: [UserModule, UserModule2, MarketingModule, LogisticsModule],
-    // }).init(parameters);
-
-    const { clientSchema } = parameters;
-    let documentAST = await $ValidateGraphql.validateClientSchema(parameters);
-
-    await $ValidateGraphql.validateSeverClientSchema({
-        documentAST,
-        clientSchema,
-    });
-    return await $ValidateGraphql.validateGraphql({
-        ...parameters,
-        documentAST,
-    });
-}
-
-test({
-    rootValue: {
-        ctx: {
-            request: {
-                setCookie() {},
-            },
-        },
-        next: () => {},
-    },
-    clientSchema: {
-        schema: `
-    query{
-      getUser {
-       name
-       id
-       adderss
-
-    }
-  }
-  `,
-        variables: {},
-        operationName: 'getUser',
-    },
-}).then((data) => {
-    console.log('getUser======', data);
-});
-
-
-
-test({
-    rootValue: {
-        ctx: {
-            request: {
-                setCookie() {},
-            },
-        },
-        next: () => {},
-    },
-    clientSchema: {
-        schema: `
-    query{
-        getUserTow {
-       name
-       id
-       adderss
-       type
-    }
-  }
-  `,
-        variables: {},
-        operationName: 'getUserTow',
-    },
-}).then((data) => {
-    console.log('getUserTow======', data);
-});
-
-
-const parameter = {
-    id: 123,
-    name: '更新用户',
-};
-test({
-    rootValue: {
-        ctx: {
-            request: {
-                setCookie() {},
-            },
-        },
-        next: () => {},
-    },
-    clientSchema: {
-        schema: `
-        mutation {
-          updateUser(id:${parameter.id}, name:"${parameter.name}") {
-            name
-            id
-            
-          }
-        }
-        `,
-        variables: {
-            userId: 123456,
-            name: 'zhang san',
-        },
-        operationName: 'updateUser',
-    },
-}).then((data) => {
-    console.log('updateUser======', data);
-});
-
-test({
-    rootValue: {
-        ctx: {
-            request: {
-                setCookie() {},
-            },
-        },
-        next: () => {},
-    },
-    clientSchema: {
-        schema: `
-        mutation($id: ID! $name: String!) {
-          updateDiscount(id: $id name: $name) {
-            name
-            id
-          }
-        }
-        `,
-        variables: {
-            id: 123456,
-            name: 'zhang san',
-        },
-        operationName: 'updateDiscount',
-    },
-}).then((data) => {
-    console.log('updateDiscount======', data);
-});
-
-// test({
-//     clientSchema: {
-//         schema: `
+// const { query, variables, operationName } = {
+//     query: `
 //     query{
-//         getUserTow {
+//       getLogistics {
 //        name
 //        id
 //     }
 //   }
 //   `,
-//         variables: {},
-//         operationName: 'getUserTow',
-//     },
-// }).then((data) => {
-//     console.log('getUserTow======', data);
-// });
+//     variables: {},
+//     // operationName: 'getUser',
+// };
 
-// test({
-//     clientSchema: {
-//         schema: `
-//         query{
-//             getLogistics {
-//              name
-//              id
-//           }
-//         }
-//   `,
-//         variables: {},
-//         operationName: 'getLogistics',
-//     },
-// }).then((data) => {
-//     console.log('getLogistics======', data);
-// });
+async function test(parameters) {
+    const { query, variables, operationName } = parameters;
 
-// test({
-//     clientSchema: {
-//         schema: `
-//         query{
-//             getDiscount {
-//              name
-//              id
-//           }
-//         }
-//   `,
-//         variables: {},
-//         operationName: 'getDiscount',
-//     },
-// }).then((data) => {
-//     console.log('getDiscount======', data);
-// });
+    // Validate Schema 验证服务端Schema
+    const schemaValidationErrors = validateSchema(schema);
+    if (schemaValidationErrors.length > 0) {
+        // Return 500: Internal Server Error if invalid schema.
+        throw 'GraphQL schema validation error.';
+    }
+
+    const parseFn = parse;
+    const validateFn = validate;
+    executeFn = executeFn ? executeFn : execute;
+    const validationRules = [];
+    // Parse source to AST, reporting any syntax error.
+    let documentAST;
+    try {
+        // 验证客户端Schema
+        documentAST = parseFn(new Source(query, 'GraphQL request'));
+    } catch (syntaxError) {
+        // Return 400: Bad Request if any syntax errors errors exist.
+        throw 'GraphQL syntax error.';
+    }
+
+    // Validate AST, reporting any errors.
+    // 服务端和客户端一起验证
+    const validationErrors = validateFn(schema, documentAST, [
+        ...specifiedRules,
+        ...validationRules,
+    ]);
+
+    if (validationErrors.length > 0) {
+        // Return 400: Bad Request if any validation errors exist.
+        throw 'GraphQL validation error.';
+    }
+
+    // Determine if this GET request will perform a non-query.
+    // const operationAST = graphql_1.getOperationAST(documentAST, operationName);
+
+    let result = {};
+
+    // Perform the execution, reporting any errors creating the context.
+    try {
+        console.log('executeFn=====', executeFn);
+        console.log('operationName=====', operationName);
+        result = await executeFn({
+            schema,
+            document: documentAST,
+            rootValue: {
+                req: {
+                    setCooket: () => {},
+                },
+            },
+            contextValue: {},
+            variableValues: variables,
+            // operationName,
+            // fieldResolver,
+            // typeResolver,
+        });
+
+        // console.log('result=====', result);
+    } catch (contextError) {
+        console.log('contextError=====', contextError);
+        // Return 400: Bad Request if any execution context errors exist.
+        throw 'GraphQL execution context error.';
+    }
+    // result.then((value) => {
+    //     console.log('value=======', value);
+    // });
+    return result;
+}
+
+test({
+    query: `
+  query{
+    getUser {
+     name
+     id
+  }
+}
+`,
+    variables: {},
+    operationName: 'getUser',
+}).then((value) => {
+    console.log('getUser=======', value);
+});
+
+test({
+    query: `
+  query{
+    getUser {
+     name
+     id
+     adderss
+  }
+}
+`,
+    variables: {},
+    operationName: 'getUser',
+}).then((value) => {
+    console.log('getUser=======', value);
+});
+
+test({
+    query: `
+  query{
+    getLogistics {
+     name
+     id
+  }
+}
+`,
+    variables: {},
+    operationName: 'getLogistics',
+}).then((value) => {
+    console.log('getLogistics=======', value);
+});
+
+test({
+    query: `
+  query{
+    getDiscount {
+     name
+     id
+  }
+}
+`,
+    variables: {},
+    operationName: 'getDiscount',
+}).then((value) => {
+    console.log('getDiscount=======', value);
+});
