@@ -61,9 +61,7 @@
   "devDependencies": {},
   "scripts": {
     "test": "mocha -r @babel/register ./test/**/*.js",
-    "cover": "nyc --reporter=html npm run test",
-    "start": "nodemon   NODE_ENV=development  babel-node ./src/index.js",
-    "modules": "nodemon   NODE_ENV=development  babel-node ./src/demo/GraphQLModules/index.js"
+    "cover": "nyc --reporter=html npm run test"
   },
   "author": "",
   "license": "ISC"
