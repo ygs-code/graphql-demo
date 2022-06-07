@@ -2,8 +2,8 @@
  * @Date: 2018-01-25 00:54:00
  * @Author: Yao guan shou
  * @LastEditors: Yao guan shou
- * @LastEditTime: 2022-03-31 14:26:47
- * @FilePath: /sharedb-textarea-example/webpack.config.js
+ * @LastEditTime: 2022-06-07 14:21:32
+ * @FilePath: /graphql-demo/graphql-modules-validate/webpack.config.js
  * @Description:
  */
 var webpack = require('webpack');
@@ -24,7 +24,7 @@ module.exports = {
     entry: {
         ValidateGraphql: path.resolve(__dirname, './esm/ValidateGraphql.js'),
     },
-    watch: true,
+    watch: false,
     //配置node环境
     target: 'node',
     node: {
