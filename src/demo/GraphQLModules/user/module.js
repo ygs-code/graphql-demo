@@ -2,7 +2,7 @@
  * @Date: 2022-05-20 14:22:59
  * @Author: Yao guan shou
  * @LastEditors: Yao guan shou
- * @LastEditTime: 2022-05-20 16:24:05
+ * @LastEditTime: 2022-06-07 11:10:21
  * @FilePath: /graphql-demo/src/demo/GraphQLModules/user/module.js
  * @Description:
  */
@@ -47,8 +47,8 @@ export const UserModule = {
         Subscription: {},
         Query: {
             getUser: (root, parameter, source, fieldASTs) => {
-                console.log('root==', root);
-                console.log('parameter==', parameter);
+                // console.log('root==', root);
+                // console.log('parameter==', parameter);
                 // console.log('source==',source)
                 // console.log('fieldASTs==',fieldASTs)
                 return {

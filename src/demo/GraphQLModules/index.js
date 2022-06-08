@@ -2,8 +2,8 @@
  * @Date: 2022-05-20 15:51:10
  * @Author: Yao guan shou
  * @LastEditors: Yao guan shou
- * @LastEditTime: 2022-05-20 16:28:48
- * @FilePath: /graphql-demo/src/demo/GraphQLModules/index2.js
+ * @LastEditTime: 2022-06-08 19:32:39
+ * @FilePath: /graphql-demo/src/demo/GraphQLModules/index.js
  * @Description:
  */
 import UserModule from './user';
@@ -15,6 +15,7 @@ import ValidateGraphql, {
 } from '../../../graphql-modules-validate';
 
 const $validateGraphql = validateGraphql({
+    lang:'zh-CN',
     modules: [
         ...UserModule2,
         ...UserModule,

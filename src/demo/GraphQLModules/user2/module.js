@@ -2,8 +2,8 @@
  * @Date: 2022-05-20 14:22:59
  * @Author: Yao guan shou
  * @LastEditors: Yao guan shou
- * @LastEditTime: 2022-05-20 16:24:05
- * @FilePath: /graphql-demo/src/demo/GraphQLModules/user/module.js
+ * @LastEditTime: 2022-06-08 19:33:50
+ * @FilePath: /graphql-demo/src/demo/GraphQLModules/user2/module.js
  * @Description:
  */
 import { createModule, gql } from 'graphql-modules';
@@ -13,7 +13,7 @@ export const UserModule2 = {
     dirname: __dirname,
     typeDefs: [
         `
- 暗示的方式地方
+ 
             type UserTow {
                 id: ID
                 name: String
