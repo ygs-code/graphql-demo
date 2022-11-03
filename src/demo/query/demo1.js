@@ -31,8 +31,8 @@ new ValidateGraphql({
                 getUser: (root, parameter, source, fieldASTs) => {
                     console.log('root==', root);
                     console.log('parameter==', parameter);
-                    // console.log('source==',source)
-                    // console.log('fieldASTs==',fieldASTs)
+                    console.log('source==',source)
+                    console.log('fieldASTs==',fieldASTs)
                     return {
                         id: '123',
                         name: 'hello my name is zhang san ',

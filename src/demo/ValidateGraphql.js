@@ -16,7 +16,7 @@ import {
   defaultFieldResolver,
 } from "graphql";
 import { makeExecutableSchema } from "graphql-tools";
-import requireGraphQLFile from 'require-graphql-file'
+import requireGraphQLFile from "require-graphql-file";
 
 // 2. Directive 實作
 // class UpperCaseDirective extends SchemaDirectiveVisitor {
@@ -189,13 +189,12 @@ class ValidateGraphql {
         variables = {},
       } = {},
     } = this.options;
-     console.log('serverSchema========',serverSchema)
+    console.log("serverSchema========", serverSchema);
     try {
       // 验证 SeverSchema
-      
       const validateSeverSchemaInfo = validateSchema(buildSchema(serverSchema));
-      console.log('validateSeverSchemaInfo=',validateSeverSchemaInfo)
-      console.log('validateSeverSchemaInfo=',validateSeverSchemaInfo)
+      console.log("validateSeverSchemaInfo=", validateSeverSchemaInfo);
+      console.log("validateSeverSchemaInfo=", validateSeverSchemaInfo);
       if (validateSeverSchemaInfo.length > 0) {
         throw validateSeverSchemaInfo;
       }
@@ -211,6 +210,13 @@ class ValidateGraphql {
       //   directiveResolvers, // 自定义指令
       //   schemaDirectives, // 自定义指令
       // });
+
+      // 验证 SeverSchema
+      this.serverSchema = makeExecutableSchema({
+        typeDefs: [gql(serverSchema)],
+        resolvers, // 可以做验证resolvers 中 Mutation，Subscription，Query
+      });
+
       console.log(chalk.rgb(36, 114, 199)("服务器schema验证通过"));
     } catch (error) {
       console.error(chalk.red("服务器schema验证失败:", error));
@@ -235,6 +241,7 @@ class ValidateGraphql {
     }
   };
 
+  //服务端的schema和客户端的schema 一起验证
   validateSeverClientSchema = async () => {
     let {
       serverSchema: { schema: serverSchema = "", resolvers = {} } = {},
@@ -262,6 +269,7 @@ class ValidateGraphql {
       );
     }
   };
+
   // 客户端Schema和请求参数与服务器的Schema校验
   validateGraphql = async () => {
     let {
@@ -274,19 +282,37 @@ class ValidateGraphql {
     try {
       // 校验客户端Schema请求参数与服务器的Schema是否匹配
       // console.log('  this.serverSchema=',  this.serverSchema)
-      console.log('clientSchema=',  clientSchema)
-      const value = await graphql(
-        this.serverSchema, //加载服务端 schema
-        clientSchema,
+      console.log("clientSchema=", clientSchema);
+
+      const value = await execute({
+        schema: this.serverSchema,
+        document: this.documentAST,
         rootValue,
-        {
-          //需要再次加载resolvers
-          ...resolvers.Mutation,
-          ...resolvers.Subscription,
-          ...resolvers.Query,
-        },
-        variables
-      );
+        // contextValue: {
+        //   //需要再次加载resolvers
+        //   ...resolvers.Mutation,
+        //   ...resolvers.Subscription,
+        //   ...resolvers.Query,
+        // },
+        variableValues: variables,
+        // operationName: "hello",
+        // fieldResolver,
+        // typeResolver,
+      });
+
+      // const value = await graphql(
+      //   this.serverSchema, //加载服务端 schema
+      //   clientSchema,
+      //   rootValue,
+      //   {
+      //     //需要再次加载resolvers
+      //     ...resolvers.Mutation,
+      //     ...resolvers.Subscription,
+      //     ...resolvers.Query,
+      //   },
+      //   variables
+      // );
+
       const { errors, data = {} } = value;
       if (errors) {
         throw errors;

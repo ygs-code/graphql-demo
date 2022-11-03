@@ -13,15 +13,17 @@ new ValidateGraphql({
         schema: `
   
 
-    extend type  Query {
-        rollDice(numDice: Int!, numSides: Int): [Int]
-    }
+        extend type Query {
+            #! 是必填参数
+            login(password: String!, username: String!, verificationCode: String!):  [Int] 
+          }
+          
     `,
         resolvers: {
             Mutation: {},
             Subscription: {},
             Query: {
-                rollDice: function (root, parameter, source, fieldASTs) {
+                login: function (root, parameter, source, fieldASTs) {
                     const { numDice, numSides } = parameter;
                     console.log('parameter=', parameter);
                     var output = [];
@@ -38,9 +40,12 @@ new ValidateGraphql({
     clientSchema: {
         schema: `
         query{
-            rollDice(numDice:3,numSides:6)
-          }
-          
+            login(
+              password:"1012341234234",
+              username:"yao guan shou",
+              verificationCode:"abc",
+              ) 
+       }
           
     `,
         variables: {},
